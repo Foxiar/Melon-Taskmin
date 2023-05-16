@@ -6,7 +6,7 @@ bool udalostNalezena = false;
 bool wantsToRun = true;
 DateOnly soucasneDatum = DateOnly.FromDateTime(DateTime.Now);
 List<Udalost> listUdalosti = new List<Udalost>();
-
+var kalendář = new Calendar(DateTime.Now);
 AnsiConsole.MarkupLine("Vítej v programu [green]Melon Taskmin[/]!");
 
 // Program je ve smyčce, aby mohl uživatel přídávat nekonečně mnoho událostí. Smyčka se ukončí až na uživatelský vyžádání.
@@ -20,10 +20,13 @@ while (wantsToRun)
         new SelectionPrompt<string>()
             .PageSize(10)
             .AddChoices(new[] {
-            "Přidat událost", "Smazat událost", "Zobrazit události", "Ukončit program",
+            "Kalendář aktuálního měsíce", "Přidat událost", "Smazat událost", "Zobrazit události", "Ukončit program",
             }));
         switch (akce)
         {
+            case "Kalendář aktuálního měsíce":
+                AnsiConsole.Write(kalendář);
+                break;
             case "Přidat událost":
                 Console.Clear();
                 var rokUdalosti = AnsiConsole.Ask<int>("Zadej rok. (YYYY)");
@@ -34,6 +37,7 @@ while (wantsToRun)
                 try
                 {
                     datumUdalosti = new DateOnly(rokUdalosti, mesicUdalosti, denUdalosti);
+                    kalendář.AddCalendarEvent(rokUdalosti, mesicUdalosti, denUdalosti);
                 }
                 catch (Exception e)
                 {
@@ -78,8 +82,25 @@ while (wantsToRun)
                         {
                             Console.Clear();
                             udalostNalezena = true;
-                            listUdalosti.Remove(item);
+                            var tempTask = item;
                             Udalost.Counter--;
+                            foreach (var eventy in kalendář.CalendarEvents)
+                            {
+                                if (eventy.Year == tempTask.DatumUdalosti.Year && eventy.Month == tempTask.DatumUdalosti.Month && eventy.Month == tempTask.DatumUdalosti.Day)
+                                {
+                                    Console.WriteLine(item);
+                                    Console.WriteLine(eventy);
+                                    kalendář.CalendarEvents.Remove(eventy);
+                                    listUdalosti.Remove(item);
+                                    Console.ReadKey();
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"test");
+                                    Console.ReadKey();
+                                }
+                            }
+                            
                             break;
                         }
                     }
