@@ -8,6 +8,7 @@ bool udalostNalezena = false;
 // Tato proměnná zajišťuje opakovaný chod cyklu celého programu
 bool wantsToRun = true;
 List<Udalost> listUdalosti = new List<Udalost>();
+List<Udalost> listSmazanychUdalosti = new List<Udalost>();
 var kalendář = new Calendar(DateTime.Now);
 kalendář.Culture("cs-CZ");
 kalendář.HeaderStyle(Style.Parse("blue bold"));
@@ -26,7 +27,7 @@ while (wantsToRun)
             .PageSize(10)
             .HighlightStyle(highlightStyle)
             .AddChoices(new[] {
-            "Kalendář aktuálního měsíce", "Přidat událost", "Smazat událost", "Zobrazit události", "Ukončit program",
+            "Kalendář aktuálního měsíce", "Přidat událost", "Smazat událost", "Zobrazit události", "Ukončit program", "Smazané události"
             }));
             // Program nyní rozhoduje co uživatel vybral a na základě toho operuje.
         switch (akce)
@@ -116,6 +117,7 @@ while (wantsToRun)
                                     // Program maže událost z kalendáře
                                         kalendář.CalendarEvents.Remove(eventy);
                                     // Program maže událost z listu událostí
+                                    listSmazanychUdalosti.Add(item);
                                     listUdalosti.Remove(item);
                                     break;
                                 }
@@ -178,6 +180,45 @@ while (wantsToRun)
                 // Ukončení cyklu pro běh programu
                 wantsToRun = false;
                 Console.ReadKey();
+                break;
+            case "Smazané události":
+                Console.Clear();
+                // Program zkontroluje, jestli není list událostí prázdný. Pokud ano, spadne na začátek.
+                if (listSmazanychUdalosti.Count == 0)
+                {
+                    Console.Clear();
+                    AnsiConsole.MarkupLine("[red]V kalendáři nejsou žádné události![/]");
+                    break;
+                }
+                // Aby uživatel věděl, které události má k dispozici a jaké mají ID, program mu to vypíše.
+                foreach (var item in listSmazanychUdalosti)
+                {
+                    AnsiConsole.MarkupLine($"[#0081AF](ID: {item.IdUdalosti}) {item.NadpisUdalosti}[/]");
+                }
+                var hledanaSmazanaUdalost = AnsiConsole.Ask<int>("[#2DC7FF]Zadej ID požadované události k prohlédnutí.[/]");
+                foreach (var item in listSmazanychUdalosti)
+                {
+                    if (item.IdUdalosti == hledanaSmazanaUdalost)
+                    {
+                        Console.Clear();
+                        udalostNalezena = true;
+                        AnsiConsole.MarkupLine($"[#2DC7FF]Datum: {item.DatumUdalosti}, Nadpis: {item.NadpisUdalosti}, Obsah: {item.ObsahUdalosti}[/]");
+                        var vratitUdalost = AnsiConsole.Ask<string>("Chceš vrátit tuto událost do kalendáře?");
+                        if (vratitUdalost == "Ano")
+                        {
+                            listUdalosti.Add(item);
+                            listSmazanychUdalosti.Remove(item);
+                            kalendář.AddCalendarEvent(item.DatumUdalosti.Year, item.DatumUdalosti.Month, item.DatumUdalosti.Day);
+                        }
+                        
+                        break;
+                    }
+                }
+                if (udalostNalezena != true)
+                {
+                    AnsiConsole.MarkupLine("[red]Událost s tímto ID neexistuje![/]");
+                }
+                udalostNalezena = false;
                 break;
 
 
