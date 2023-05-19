@@ -1,14 +1,18 @@
 ﻿using Kalendar;
+using Kalendar.Properties;
 using Spectre.Console;
 
+var highlightStyle = new Style().Foreground(Color.FromInt32(32));
 // Tato proměnná je určena k tomu, aby byl program schopný říct, zda byla/nebyla nalezena událost ke smazání/prohlédnutí.
 bool udalostNalezena = false;
 // Tato proměnná zajišťuje opakovaný chod cyklu celého programu
 bool wantsToRun = true;
-DateOnly soucasneDatum = DateOnly.FromDateTime(DateTime.Now);
 List<Udalost> listUdalosti = new List<Udalost>();
 var kalendář = new Calendar(DateTime.Now);
-AnsiConsole.MarkupLine("Vítej v programu [green]Melon Taskmin[/]!");
+kalendář.Culture("cs-CZ");
+kalendář.HeaderStyle(Style.Parse("blue bold"));
+AnsiConsole.Background = Spectre.Console.Color.DeepSkyBlue3_1;
+AnsiConsole.WriteLine("Vítej v programu Melon Taskmin!");
 
 // Program je ve smyčce, aby mohl uživatel přídávat nekonečně mnoho událostí. Smyčka se ukončí až na uživatelský vyžádání.
 while (wantsToRun)
@@ -20,6 +24,7 @@ while (wantsToRun)
         var akce = AnsiConsole.Prompt(
         new SelectionPrompt<string>()
             .PageSize(10)
+            .HighlightStyle(highlightStyle)
             .AddChoices(new[] {
             "Kalendář aktuálního měsíce", "Přidat událost", "Smazat událost", "Zobrazit události", "Ukončit program",
             }));
@@ -35,9 +40,9 @@ while (wantsToRun)
             case "Přidat událost":
                 Console.Clear();
                 // Program vyžaduje po uživateli datum, do kterého chce zapsat událost.
-                var rokUdalosti = AnsiConsole.Ask<int>("Zadej rok. (YYYY)");
-                var mesicUdalosti = AnsiConsole.Ask<int>("Zadej měsíc. (MM)");
-                var denUdalosti = AnsiConsole.Ask<int>("Zadej den. (DD)");
+                var rokUdalosti = AnsiConsole.Ask<int>("[deepskyblue3_1]Zadej rok (YYYY):[/]");
+                var mesicUdalosti = AnsiConsole.Ask<int>("[deepskyblue3_1]Zadej měsíc (MM):[/]");
+                var denUdalosti = AnsiConsole.Ask<int>("[deepskyblue3_1]Zadej den (DD):[/]");
 
                 DateOnly datumUdalosti;
                 try
@@ -54,8 +59,8 @@ while (wantsToRun)
                     break;
                 }
 
-                var nadpisUdalosti = AnsiConsole.Ask<string>("Zadej nadpis.");
-                var obsahUdalosti = AnsiConsole.Ask<string>("Zadej podrobný popis události.");
+                var nadpisUdalosti = AnsiConsole.Ask<string>("[deepskyblue3_1]Zadej nadpis:[/]");
+                var obsahUdalosti = AnsiConsole.Ask<string>("[deepskyblue3_1]Zadej podrobný popis události:[/]");
 
                 // Zde se vytvoří objekt udalost, do kterého se dosadí parametry, které jsme vytvořili předtím.
                 Udalost udalost = new Udalost(datumUdalosti, nadpisUdalosti, obsahUdalosti);
@@ -78,7 +83,7 @@ while (wantsToRun)
                 foreach (var item in listUdalosti)
                 {
 
-                    Console.WriteLine($"[ID: {item.IdUdalosti}] {item.NadpisUdalosti}");
+                    AnsiConsole.MarkupLine($"[#0081AF](ID: {item.IdUdalosti}) {item.NadpisUdalosti}[/]");
                 }
                 var smazanaUdalost = AnsiConsole.Ask<int>("Zadej ID požadované události ke smazání. Pro zrušení zadej 0");
                 if (smazanaUdalost == 0)
@@ -109,7 +114,7 @@ while (wantsToRun)
                                 if (dateTempTask.Year == tempTask.DatumUdalosti.Year && dateTempTask.Month == tempTask.DatumUdalosti.Month && dateTempTask.Day == tempTask.DatumUdalosti.Day)
                                 {
                                     // Program maže událost z kalendáře
-                                    kalendář.CalendarEvents.Remove(eventy);
+                                        kalendář.CalendarEvents.Remove(eventy);
                                     // Program maže událost z listu událostí
                                     listUdalosti.Remove(item);
                                     break;
@@ -142,17 +147,16 @@ while (wantsToRun)
                 // Aby uživatel věděl, které události má k dispozici a jaké mají ID, program mu to vypíše.
                 foreach (var item in listUdalosti)
                 {
-
-                    Console.WriteLine($"[ID: {item.IdUdalosti}] {item.NadpisUdalosti}");
+                    AnsiConsole.MarkupLine($"[#0081AF](ID: {item.IdUdalosti}) {item.NadpisUdalosti}[/]");
                 }
-                var hledanaUdalost = AnsiConsole.Ask<int>("Zadej ID požadované události k prohlédnutí.");
+                var hledanaUdalost = AnsiConsole.Ask<int>("[#2DC7FF]Zadej ID požadované události k prohlédnutí.[/]");
                 foreach (var item in listUdalosti)
                 {
                     if (item.IdUdalosti == hledanaUdalost)
                     {
                         Console.Clear();
                         udalostNalezena = true;
-                        AnsiConsole.MarkupLine($"Datum: {item.DatumUdalosti}, Nadpis: {item.NadpisUdalosti}, Obsah: {item.ObsahUdalosti}");
+                        AnsiConsole.MarkupLine($"[#2DC7FF]Datum: {item.DatumUdalosti}, Nadpis: {item.NadpisUdalosti}, Obsah: {item.ObsahUdalosti}[/]");
                         break;
                     }
                 }
@@ -166,11 +170,11 @@ while (wantsToRun)
             case "Ukončit program":
                 Console.Clear();
                 // Vypisování obrázku
-                var image = new CanvasImage("logoo.png");
-                image.MaxWidth(18);
+                var obrazek = new CanvasImage(Resources.logoo);
+                obrazek.MaxWidth(18);
                 Console.Clear();
                 AnsiConsole.MarkupLine("[green]Melon Taskmin[/] byl úspěšně ukončen!");
-                AnsiConsole.Write(image);
+                AnsiConsole.Write(obrazek);
                 // Ukončení cyklu pro běh programu
                 wantsToRun = false;
                 Console.ReadKey();
