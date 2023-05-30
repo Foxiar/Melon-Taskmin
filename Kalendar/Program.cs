@@ -187,7 +187,7 @@ while (wantsToRun)
                 if (listSmazanychUdalosti.Count == 0)
                 {
                     Console.Clear();
-                    AnsiConsole.MarkupLine("[red]V kalendáři nejsou žádné události![/]");
+                    AnsiConsole.MarkupLine("[red]Žádné události nebyly zatím smazány![/]");
                     break;
                 }
                 // Aby uživatel věděl, které události má k dispozici a jaké mají ID, program mu to vypíše.
