@@ -13,7 +13,7 @@ var kalendář = new Calendar(DateTime.Now);
 kalendář.Culture("cs-CZ");
 kalendář.HeaderStyle(Style.Parse("blue bold"));
 AnsiConsole.Background = Spectre.Console.Color.DeepSkyBlue3_1;
-AnsiConsole.WriteLine("Vítej v programu Melon Taskmin!");
+AnsiConsole.WriteLine("Vítej v programu Melon Taskmin! knedlíček");
 
 // Program je ve smyčce, aby mohl uživatel přídávat nekonečně mnoho událostí. Smyčka se ukončí až na uživatelský vyžádání.
 while (wantsToRun)
